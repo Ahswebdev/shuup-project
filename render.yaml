@@ -1,0 +1,47 @@
+# Render Blueprint — 100% free hosting
+# Web: Render free tier | Database: Neon free tier (sign up separately)
+#
+# Deploy: connect this repo in Render Dashboard → New Blueprint → apply this file
+
+services:
+  - type: web
+    name: menswear-store
+    runtime: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: APP_NAME
+        value: MENSWEAR
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        sync: false
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_ADMIN_URL
+        value: admin
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: error
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_SSLMODE
+        value: require
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: public
+      - key: RUN_SEED
+        value: "true"
+      - key: PORT
+        value: "10000"
