@@ -20,18 +20,20 @@ RUN cd packages/Webkul/Shop && npm run build
 # --- Stage 2: Install PHP dependencies ---------------------------------------
 FROM php:8.3-cli-bookworm AS vendor
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        git \
-        unzip \
-        libicu-dev \
-        libzip-dev \
-        libpng-dev \
-        libjpeg62-turbo-dev \
-        libfreetype6-dev \
-        libgmp-dev \
-        libpq-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) bcmath calendar gd gmp intl mbstring pdo_mysql pdo_pgsql zip \
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+RUN install-php-extensions \
+        bcmath \
+        calendar \
+        gd \
+        gmp \
+        intl \
+        mbstring \
+        pdo_mysql \
+        pdo_pgsql \
+        zip
+
+RUN apt-get update && apt-get install -y --no-install-recommends git unzip \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -56,19 +58,9 @@ ENV APP_DEBUG=false
 ENV LOG_CHANNEL=stderr
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        gettext-base \
-        libfreetype6-dev \
-        libgmp-dev \
-        libicu-dev \
-        libjpeg62-turbo-dev \
-        libpng-dev \
-        libpq-dev \
-        libzip-dev \
-        nginx \
-        supervisor \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+RUN install-php-extensions \
         bcmath \
         calendar \
         exif \
@@ -79,9 +71,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         pcntl \
         pdo_mysql \
         pdo_pgsql \
-        zip \
-    && apt-get purge -y --auto-remove \
-    && rm -rf /var/lib/apt/lists/* /tmp/*
+        zip
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gettext-base \
+        nginx \
+        supervisor \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY docker/render/php.ini /usr/local/etc/php/conf.d/99-bagisto.ini
 
