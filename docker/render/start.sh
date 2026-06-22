@@ -6,7 +6,25 @@ cd /var/www/html
 export PORT="${PORT:-10000}"
 
 if [ ! -f .env ]; then
-    cp .env.example .env
+    if [ -f .env.example ]; then
+        cp .env.example .env
+    else
+        cat > .env <<EOF
+APP_NAME=${APP_NAME:-MENSWEAR}
+APP_ENV=${APP_ENV:-production}
+APP_KEY=${APP_KEY:-}
+APP_DEBUG=${APP_DEBUG:-false}
+APP_URL=${APP_URL:-http://localhost}
+APP_ADMIN_URL=${APP_ADMIN_URL:-admin}
+LOG_CHANNEL=${LOG_CHANNEL:-stderr}
+DB_CONNECTION=${DB_CONNECTION:-pgsql}
+DB_SSLMODE=${DB_SSLMODE:-require}
+SESSION_DRIVER=${SESSION_DRIVER:-database}
+CACHE_STORE=${CACHE_STORE:-file}
+QUEUE_CONNECTION=${QUEUE_CONNECTION:-sync}
+FILESYSTEM_DISK=${FILESYSTEM_DISK:-public}
+EOF
+    fi
 fi
 
 export DB_URL="${DB_URL:-${DATABASE_URL:-}}"

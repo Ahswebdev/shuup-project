@@ -6,6 +6,7 @@
 .agents
 .env
 .env.*
+!.env.example
 !.env.render.example
 node_modules
 vendor
